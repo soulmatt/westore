@@ -1,0 +1,138 @@
+/* WeStore 커스텀 스타일 */
+
+body {
+  background-color: #f8f9fa;
+}
+
+/* 드롭존 공통 */
+#orderDropZone .dz-preview .dz-progress,
+#invoiceDropZone .dz-preview .dz-progress {
+  display: none;
+}
+
+.dropzone {
+  border-style: dotted !important;
+  border-radius: 8px;
+  transition: opacity 0.2s;
+  min-height: 120px;
+}
+
+.dropzone .dz-message {
+  font-weight: 500;
+  color: #333;
+}
+
+/* 발주서 드롭존 (노란색) */
+#orderDropZone {
+  background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%);
+  border-color: #6c757d !important;
+}
+
+/* 송장 드롭존 (파란색) */
+#invoiceDropZone {
+  background: linear-gradient(135deg, #0d6efd 0%, #3d8bfd 100%);
+  border-color: #6c757d !important;
+}
+
+#invoiceDropZone .dz-message span {
+  color: #fff;
+}
+
+/* 발송처 정보 카드 */
+.seller-card {
+  border-left: 4px solid #198754;
+}
+
+/* 상태 배지 영역 */
+.status-area {
+  min-height: 32px;
+}
+
+/* 섹션 헤더 */
+.section-header {
+  font-weight: bold;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+/* 버튼 간격 */
+.btn-group-custom > .btn {
+  margin-right: 8px;
+}
+
+/* 컬럼 에디터 */
+.column-editor-row {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  transition: background-color 0.15s;
+}
+
+.column-editor-row:hover {
+  background-color: #f8f9fa;
+}
+
+.column-editor-col-letter {
+  font-weight: bold;
+  width: 32px;
+  min-width: 32px;
+  text-align: center;
+  color: #6c757d;
+}
+
+.column-editor-col-name {
+  flex: 1;
+  margin: 0 10px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.column-editor-col-name:not(.editing):hover {
+  background-color: #e9ecef;
+}
+
+.column-editor-col-name.empty {
+  color: #adb5bd;
+  font-style: italic;
+}
+
+.column-editor-col-name.editing {
+  display: flex;
+  gap: 4px;
+  padding: 0;
+  cursor: default;
+}
+
+.column-editor-input {
+  flex: 1;
+}
+
+.column-editor-clear-btn {
+  padding: 2px 6px;
+  flex-shrink: 0;
+}
+
+.column-editor-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.column-editor-actions .btn {
+  padding: 2px 6px;
+  font-size: 0.75rem;
+}
+
+/* 푸터 */
+.footer-text {
+  color: #6c757d;
+  font-size: 0.85rem;
+}

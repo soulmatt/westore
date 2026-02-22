@@ -1,0 +1,86 @@
+import { BaseMarketplace } from './base-marketplace.js';
+import { registry } from '../core/marketplace-registry.js';
+
+class St11 extends BaseMarketplace {
+  constructor() {
+    super({
+      id: 'st11',
+      platformName: '11번가',
+      invoiceFileName: '송장_11번가_',
+      parseRowOffset: 1,
+      useDefval: false,
+      columns: {
+        recipientName: '수취인',
+        zipCode: '우편번호',
+        address: '주소',
+        phone1: '휴대폰번호',
+        phone2: '전화번호',
+        productName: '상품명',
+        option: '옵션',
+        quantity: '수량',
+        deliveryMessage: '배송메시지',
+        orderNumber: '주문번호',
+      },
+      job2SheetName: 'sk11st 발송처리 sheet',
+      job2FileType: 'xls',
+      job2Origin: 1,
+    });
+  }
+
+  detect(headers) {
+    return headers[0] && headers[0].includes('발송준비중내역');
+  }
+
+  getPhone2Type2(order) {
+    return '';
+  }
+
+  matchInvoices(allInvoiceJson, sellerInfo) {
+    this.invoices = [];
+    const filtered = this._filterInvoicesByPlatform(allInvoiceJson, this.platformName);
+
+    const buildEntry = (order, invoiceNumber) => ({
+      "번호": order["번호"],
+      "주문일시": order["주문일시"],
+      "결제완료일": order["결제일시"],
+      "주문번호": order["주문번호"],
+      "주문상태": order["주문상태"],
+      "배송번호": order["배송번호"],
+      "택배사코드": sellerInfo.vendor.st11.code,
+      "송장/등기번호": invoiceNumber,
+      "배송방법": sellerInfo.vendor.st11.deliveryType,
+      "상품번호": order["상품번호"],
+    });
+
+    if (sellerInfo.vendor.id === 1) {
+      this.orders.forEach(order => {
+        filtered.forEach(invoice => {
+          const nameMatch = (invoice["받는분"] || '').replace(/ /g, '') ===
+            (order["수취인"] || '').replace(/ /g, '');
+          const addrMatch = (invoice["받는분주소"] || '').replace(/ /g, '') ===
+            (order["주소"] || '').replace(/ /g, '');
+          if (nameMatch && addrMatch) {
+            this.invoices.push(buildEntry(order, invoice["운송장번호"]));
+          }
+        });
+      });
+    }
+
+    if (sellerInfo.vendor.id === 2) {
+      this.orders.forEach(order => {
+        this.invoices.push(buildEntry(order, ''));
+      });
+      filtered.forEach(invoice => {
+        const orderNumber = (invoice["고객주문번호"] || '').split('/')[1];
+        if (!orderNumber) return;
+        this.orders.forEach((orderInfo, idx) => {
+          if (orderNumber.replace(/ /g, '') == orderInfo["주문번호"]) {
+            this.invoices[idx]["송장/등기번호"] = invoice["운송장번호"];
+          }
+        });
+      });
+    }
+  }
+}
+
+registry.register(new St11());
