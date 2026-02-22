@@ -88,7 +88,7 @@ function handleOrderExcel(sheet) {
   const marketplace = registry.detect(sheet);
   if (marketplace) {
     marketplace.parseOrders(sheet);
-    statusDisplay.showOrderStatus(marketplace.platformName);
+    statusDisplay.showOrderStatus(marketplace.platformName, marketplace.orders.length);
   } else {
     statusDisplay.showOrderError('미지원 발주서');
     alert('미지원 발주서가 존재합니다.\n해당 파일은 무시됩니다.');

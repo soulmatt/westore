@@ -64,6 +64,10 @@ class FormHandler {
       this._validate();
       this._isLoaded = false;
       this._updateSaveBtn();
+      // URL 파라미터에 발송처 정보가 있으면 제거
+      const url = new URL(window.location);
+      ['name', 'phone', 'addr', 'msg'].forEach(p => url.searchParams.delete(p));
+      window.history.replaceState({}, '', url);
       alert('발송처 정보가 삭제되었습니다.');
     });
   }

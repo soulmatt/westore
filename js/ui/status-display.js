@@ -12,8 +12,8 @@ class StatusDisplay {
     this._invoiceStatus = document.getElementById('invoiceStatus');
   }
 
-  showOrderStatus(marketplaceName) {
-    this._appendBadge(this._orderStatus, marketplaceName, 'bg-success');
+  showOrderStatus(marketplaceName, orderCount) {
+    this._appendBadge(this._orderStatus, `${marketplaceName}(${orderCount}건)`, 'bg-success');
   }
 
   showOrderError(message) {

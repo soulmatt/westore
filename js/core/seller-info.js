@@ -27,6 +27,7 @@ class SellerInfo {
       this.senderName = paramName || '';
       this.phone = paramPhone || '';
       this.addr = paramAddr || '';
+      this.defaultMessage = params.get('msg') || '';
       return;
     }
 

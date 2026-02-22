@@ -84,19 +84,13 @@
   <!-- 1. 발주서 합치기 -->
   <h5 class="section-header bg-success mb-3">1. 발주서 합치기</h5>
 
-  <div class="mb-3">
-    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#marketplaceModal">
-      <i class="bi bi-list-ol"></i> 지원 판매처
-    </button>
-  </div>
+  <div class="status-area mb-2" id="orderStatus"></div>
 
   <div id="orderDropZone" class="dropzone border border-secondary border-3 text-center py-4 mb-2">
     <div class="dz-message" data-dz-message>
       <span><i class="bi bi-file-earmark-spreadsheet"></i> 각 판매처 발주 파일 올리기 (click or drop)</span>
     </div>
   </div>
-
-  <div class="status-area mb-2" id="orderStatus"></div>
 
   <div class="text-center mb-2">
     <button type="button" class="btn btn-warning" id="downloadJob1Excel">
@@ -108,7 +102,7 @@
   </div>
 
   <!-- 2. 송장입력 -->
-  <h5 class="section-header bg-success mb-3">2. 송장입력</h5>
+  <h5 class="section-header bg-success mb-3 mt-5">2. 송장입력</h5>
 
   <div id="invoiceDropZone" class="dropzone border border-secondary border-3 text-center py-4 mb-2">
     <div class="dz-message" data-dz-message>
@@ -130,35 +124,6 @@
   </div>
 </div>
 
-<!-- 판매처 목록 모달 -->
-<div class="modal fade" id="marketplaceModal" tabindex="-1" aria-labelledby="marketplaceModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title text-success fw-bold" id="marketplaceModalLabel">
-          <i class="bi bi-list-ol"></i> 지원 판매처 목록
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item">스마트스토어</li>
-          <li class="list-group-item">쿠팡</li>
-          <li class="list-group-item">옥션 / 지마켓</li>
-          <li class="list-group-item">11번가</li>
-          <li class="list-group-item">카카오톡스토어</li>
-          <li class="list-group-item">롯데on</li>
-          <li class="list-group-item">인터파크</li>
-          <li class="list-group-item">위메프</li>
-          <li class="list-group-item">SSG.COM</li>
-        </ul>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- 컬럼 에디터 모달 -->
 <div class="modal fade" id="columnEditorModal" tabindex="-1" aria-labelledby="columnEditorModalLabel" aria-hidden="true">
