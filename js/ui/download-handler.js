@@ -36,7 +36,7 @@ class DownloadHandler {
     }
 
     const vendor = sellerInfo.vendor;
-    const fileName = vendor.fileName + '_' + getNowDateForFileName() + '.xlsx';
+    const fileName = '택배업로드용_' + getNowDateForFileName() + '.xlsx';
     const wb = XLSX.utils.book_new();
 
     const columnOrder = columnEditor.getColumnOrder();

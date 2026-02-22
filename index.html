@@ -25,7 +25,7 @@
     <div class="card-body">
       <h5 class="card-title mb-3"><i class="bi bi-truck"></i> 발송처 정보</h5>
       <div class="row g-3 align-items-center mb-2">
-        <div class="col-auto">
+        <div class="col-1">
           <label for="senderName" class="col-form-label col-form-label-sm">발송처명</label>
         </div>
         <div class="col">
@@ -36,7 +36,7 @@
         </div>
       </div>
       <div class="row g-3 align-items-center mb-2">
-        <div class="col-auto">
+        <div class="col-1">
           <label for="storeTelephone" class="col-form-label col-form-label-sm">전화번호</label>
         </div>
         <div class="col">
@@ -47,7 +47,7 @@
         </div>
       </div>
       <div class="row g-3 align-items-center mb-2">
-        <div class="col-auto">
+        <div class="col-1">
           <label for="storeAddress" class="col-form-label col-form-label-sm">주소</label>
         </div>
         <div class="col">
@@ -58,11 +58,14 @@
         </div>
       </div>
       <div class="row g-3 align-items-center mb-2">
-        <div class="col-auto">
-          <label for="defaultMessage" class="col-form-label col-form-label-sm">기본 배송메세지</label>
+        <div class="col-1">
+          <label for="defaultMessage" class="col-form-label col-form-label-sm">배송메세지</label>
         </div>
         <div class="col">
-          <input type="text" class="form-control form-control-sm" id="defaultMessage" placeholder="주문 배송메세지가 없을 때 사용됩니다">
+          <input type="text" class="form-control form-control-sm" id="defaultMessage">
+        </div>
+        <div class="col-auto">
+          <small class="form-text text-muted">배송메세지가 없는 주문에 사용됩니다</small>
         </div>
       </div>
       <div class="row g-3 mt-1">
