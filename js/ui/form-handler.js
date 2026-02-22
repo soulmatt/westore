@@ -15,6 +15,7 @@ class FormHandler {
     this._saveBtn = document.getElementById('btnSave');
     this._saveBtnText = document.getElementById('btnSaveText');
     this._clearBtn = document.getElementById('btnClear');
+    this._copyUrlBtn = document.getElementById('btnCopyUrl');
 
     this._nameError = document.getElementById('senderNameError');
     this._phoneError = document.getElementById('storeTelephoneError');
@@ -69,6 +70,17 @@ class FormHandler {
       ['name', 'phone', 'addr', 'msg'].forEach(p => url.searchParams.delete(p));
       window.history.replaceState({}, '', url);
       alert('발송처 정보가 삭제되었습니다.');
+    });
+
+    this._copyUrlBtn.addEventListener('click', () => {
+      const url = new URL(window.location.origin + window.location.pathname);
+      if (sellerInfo.senderName) url.searchParams.set('name', sellerInfo.senderName);
+      if (sellerInfo.phone) url.searchParams.set('phone', sellerInfo.phone);
+      if (sellerInfo.addr) url.searchParams.set('addr', sellerInfo.addr);
+      if (sellerInfo.defaultMessage) url.searchParams.set('msg', sellerInfo.defaultMessage);
+      navigator.clipboard.writeText(url.toString()).then(() => {
+        alert('URL이 클립보드에 복사되었습니다.\n\n' + url.toString());
+      });
     });
   }
 
