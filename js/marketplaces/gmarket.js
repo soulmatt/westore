@@ -41,7 +41,7 @@ class Gmarket extends BaseMarketplace {
   }
 
   getCustomerOrderNumber(order) {
-    return this._getStoreName(order) + '/' + order["주문번호"];
+    return order["주문번호"];
   }
 
   getCustomerOrderNumberType2(order) {
@@ -50,20 +50,14 @@ class Gmarket extends BaseMarketplace {
 
   matchInvoices(allInvoiceJson, sellerInfo) {
     this.invoices = [];
-    const filtered = allInvoiceJson.filter(inv => {
-      const num = inv["고객주문번호"] || '';
-      return num.includes(this._gmarketName) || num.includes(this._auctionName);
-    });
 
     if (sellerInfo.vendor.id === 1) {
       this.orders.forEach(order => {
+        const orderNum = String(order["주문번호"] || '').replace(/ /g, '');
         const optionName = order["주문옵션"] ? ' - ' + order["주문옵션"] : '';
-        filtered.forEach(invoice => {
-          const nameMatch = (invoice["받는분"] || '').replace(/ /g, '') ===
-            (order["수령인명"] || '').replace(/ /g, '');
-          const addrMatch = (invoice["받는분주소"] || '').replace(/ /g, '') ===
-            (order["주소"] || '').replace(/ /g, '');
-          if (nameMatch && addrMatch) {
+        allInvoiceJson.forEach(invoice => {
+          const invoiceNum = String(invoice["고객주문번호"] || '').replace(/ /g, '');
+          if (invoiceNum === orderNum) {
             this.invoices.push({
               "계정": order["아이디"],
               "상품명": order["상품명"] + optionName,
@@ -93,8 +87,8 @@ class Gmarket extends BaseMarketplace {
           "운송장/등기번호": '',
         });
       });
-      filtered.forEach(invoice => {
-        const orderNumber = (invoice["고객주문번호"] || '').split('/')[1];
+      allInvoiceJson.forEach(invoice => {
+        const orderNumber = String(invoice["고객주문번호"] || '');
         if (!orderNumber) return;
         this.invoices.forEach(inv => {
           if (orderNumber.replace(/ /g, '') == inv["주문번호"]) {

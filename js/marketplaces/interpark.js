@@ -34,7 +34,6 @@ class Interpark extends BaseMarketplace {
 
   matchInvoices(allInvoiceJson, sellerInfo) {
     this.invoices = [];
-    const filtered = this._filterInvoicesByPlatform(allInvoiceJson, this.platformName);
 
     const buildEntry = (order, invoiceNumber) => {
       const optionName = order["옵션명"] ? ' - ' + order["옵션명"] : '';
@@ -53,12 +52,10 @@ class Interpark extends BaseMarketplace {
 
     if (sellerInfo.vendor.id === 1) {
       this.orders.forEach(order => {
-        filtered.forEach(invoice => {
-          const nameMatch = (invoice["받는분"] || '').replace(/ /g, '') ===
-            (order["수령자명"] || '').replace(/ /g, '');
-          const addrMatch = (invoice["받는분주소"] || '').replace(/ /g, '') ===
-            (order["주소"] || '').replace(/ /g, '');
-          if (nameMatch && addrMatch) {
+        const orderNum = String(order["주문번호"] || '').replace(/ /g, '');
+        allInvoiceJson.forEach(invoice => {
+          const invoiceNum = String(invoice["고객주문번호"] || '').replace(/ /g, '');
+          if (invoiceNum === orderNum) {
             this.invoices.push(buildEntry(order, invoice["운송장번호"]));
           }
         });
@@ -66,15 +63,11 @@ class Interpark extends BaseMarketplace {
     }
 
     if (sellerInfo.vendor.id === 2) {
-      // Type2: 원본은 '상품상세내용' 컬럼으로 필터링
-      const filteredType2 = allInvoiceJson.filter(inv =>
-        inv["고객주문번호"] && inv["고객주문번호"].includes(this.platformName)
-      );
       this.orders.forEach(order => {
         this.invoices.push(buildEntry(order, ''));
       });
-      filteredType2.forEach(invoice => {
-        const orderNumber = (invoice["고객주문번호"] || '').split('/')[1];
+      allInvoiceJson.forEach(invoice => {
+        const orderNumber = String(invoice["고객주문번호"] || '');
         if (!orderNumber) return;
         this.invoices.forEach(inv => {
           if (orderNumber.replace(/ /g, '') == inv["주문번호"]) {

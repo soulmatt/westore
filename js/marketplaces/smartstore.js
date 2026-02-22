@@ -37,22 +37,18 @@ class SmartStore extends BaseMarketplace {
 
   // Type2에서는 주문번호 컬럼이 다름
   getCustomerOrderNumberType2(order) {
-    return this.platformName + '/' + order["주문번호"];
+    return order["주문번호"];
   }
 
   matchInvoices(allInvoiceJson, sellerInfo) {
     this.invoices = [];
-    const filtered = this._filterInvoicesByPlatform(allInvoiceJson, this.platformName);
 
     if (sellerInfo.vendor.id === 1) {
       this.orders.forEach(order => {
-        filtered.forEach(invoice => {
-          // 원본: order["수취인명"]과 order["배송지"]로 매칭
-          const nameMatch = (invoice["받는분"] || '').replace(/ /g, '') ===
-            (order["수취인명"] || '').replace(/ /g, '');
-          const addrMatch = (invoice["받는분주소"] || '').replace(/ /g, '') ===
-            (order["배송지"] || '').replace(/ /g, '');
-          if (nameMatch && addrMatch) {
+        const orderNum = String(order["상품주문번호"] || '').replace(/ /g, '');
+        allInvoiceJson.forEach(invoice => {
+          const invoiceNum = String(invoice["고객주문번호"] || '').replace(/ /g, '');
+          if (invoiceNum === orderNum) {
             this.invoices.push({
               "상품주문번호": order["상품주문번호"],
               "배송방법": "택배,등기,소포",
@@ -65,7 +61,6 @@ class SmartStore extends BaseMarketplace {
     }
 
     if (sellerInfo.vendor.id === 2) {
-      // Type2: 모든 주문을 먼저 엔트리로 생성
       this.orders.forEach(order => {
         this.invoices.push({
           "상품주문번호": order["상품주문번호"],
@@ -74,9 +69,8 @@ class SmartStore extends BaseMarketplace {
           "송장번호": '',
         });
       });
-      // 고객주문번호에서 주문번호를 추출하여 매칭 (원본: order["주문번호"]로 비교)
-      filtered.forEach(invoice => {
-        const orderNumber = (invoice["고객주문번호"] || '').split('/')[1];
+      allInvoiceJson.forEach(invoice => {
+        const orderNumber = String(invoice["고객주문번호"] || '');
         if (!orderNumber) return;
         this.orders.forEach((order, idx) => {
           if (orderNumber.replace(/ /g, '') == order["주문번호"]) {

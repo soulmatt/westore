@@ -37,16 +37,13 @@ class WeMakePrice extends BaseMarketplace {
 
   matchInvoices(allInvoiceJson, sellerInfo) {
     this.invoices = [];
-    const filtered = this._filterInvoicesByPlatform(allInvoiceJson, this.platformName);
 
     if (sellerInfo.vendor.id === 1) {
       this.orders.forEach(order => {
-        filtered.forEach(invoice => {
-          const nameMatch = (invoice["받는분"] || '').replace(/ /g, '') ===
-            (order["받는사람"] || '').replace(/ /g, '');
-          const addrMatch = (invoice["받는분주소"] || '').replace(/ /g, '') ===
-            (order["주소"] || '').replace(/ /g, '');
-          if (nameMatch && addrMatch) {
+        const orderNum = String(order["주문번호"] || '').replace(/ /g, '');
+        allInvoiceJson.forEach(invoice => {
+          const invoiceNum = String(invoice["고객주문번호"] || '').replace(/ /g, '');
+          if (invoiceNum === orderNum) {
             const entry = { ...order };
             entry["송장번호"] = invoice["운송장번호"];
             entry["택배사"] = sellerInfo.vendor.wemakeprice.viewName;
@@ -60,8 +57,8 @@ class WeMakePrice extends BaseMarketplace {
       this.orders.forEach(order => {
         this.invoices.push({ ...order });
       });
-      filtered.forEach(invoice => {
-        const orderNumber = (invoice["고객주문번호"] || '').split('/')[1];
+      allInvoiceJson.forEach(invoice => {
+        const orderNumber = String(invoice["고객주문번호"] || '');
         if (!orderNumber) return;
         this.invoices.forEach(inv => {
           if (orderNumber.replace(/ /g, '') == inv["주문번호"]) {

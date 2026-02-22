@@ -134,7 +134,7 @@ export class BaseMarketplace {
   }
 
   getCustomerOrderNumber(order, sellerInfo) {
-    return this.platformName + '/' + order[this.columns.orderNumber];
+    return order[this.columns.orderNumber];
   }
 
   getCustomerOrderNumberType2(order, sellerInfo) {
@@ -143,26 +143,15 @@ export class BaseMarketplace {
 
   // ---- 공통 송장 매칭 헬퍼 ----
 
-  _filterInvoicesByPlatform(allInvoiceJson, platformNames) {
-    const names = Array.isArray(platformNames) ? platformNames : [platformNames];
-    return allInvoiceJson.filter(inv => {
-      if (!inv["고객주문번호"]) return false;
-      return names.some(n => inv["고객주문번호"].includes(n));
-    });
-  }
-
-  _matchByNameAndAddress(allInvoiceJson, sellerInfo, buildInvoiceEntry) {
+  _matchByOrderNumber(allInvoiceJson, sellerInfo, buildInvoiceEntry) {
     this.invoices = [];
-    const filtered = this._filterInvoicesByPlatform(allInvoiceJson, this.platformName);
 
     if (sellerInfo.vendor.id === 1) {
       this.orders.forEach(order => {
-        filtered.forEach(invoice => {
-          const nameMatch = (invoice["받는분"] || '').replace(/ /g, '') ===
-            (order[this.columns.recipientName] || '').replace(/ /g, '');
-          const addrMatch = (invoice["받는분주소"] || '').replace(/ /g, '') ===
-            (order[this.columns.address] || '').replace(/ /g, '');
-          if (nameMatch && addrMatch) {
+        const orderNum = String(order[this.columns.orderNumber] || '').replace(/ /g, '');
+        allInvoiceJson.forEach(invoice => {
+          const invoiceNum = String(invoice["고객주문번호"] || '').replace(/ /g, '');
+          if (invoiceNum === orderNum) {
             this.invoices.push(buildInvoiceEntry(order, invoice, sellerInfo));
           }
         });
@@ -170,16 +159,16 @@ export class BaseMarketplace {
     }
 
     if (sellerInfo.vendor.id === 2) {
-      this._matchType2(filtered, sellerInfo, buildInvoiceEntry);
+      this._matchType2(allInvoiceJson, sellerInfo, buildInvoiceEntry);
     }
   }
 
-  _matchType2(filtered, sellerInfo, buildInvoiceEntry) {
+  _matchType2(allInvoiceJson, sellerInfo, buildInvoiceEntry) {
     this.orders.forEach(order => {
       this.invoices.push(buildInvoiceEntry(order, null, sellerInfo));
     });
-    filtered.forEach(invoice => {
-      const orderNumber = (invoice["고객주문번호"] || '').split('/')[1];
+    allInvoiceJson.forEach(invoice => {
+      const orderNumber = String(invoice["고객주문번호"] || '');
       if (!orderNumber) return;
       this.invoices.forEach(inv => {
         if (this._matchType2OrderNumber(inv, orderNumber)) {
