@@ -11,6 +11,7 @@ class SellerInfo {
     this.senderName = '';
     this.phone = '';
     this.addr = '';
+    this.defaultMessage = '';
     this.vendorId = 1;
     this.vendor = getVendorById(1);
     this._load();
@@ -36,6 +37,7 @@ class SellerInfo {
         this.senderName = data.senderName || '';
         this.phone = data.phone || '';
         this.addr = data.addr || '';
+        this.defaultMessage = data.defaultMessage || '';
         this.vendorId = 1;
         this.vendor = getVendorById(1);
       } catch {
@@ -49,6 +51,7 @@ class SellerInfo {
       senderName: this.senderName,
       phone: this.phone,
       addr: this.addr,
+      defaultMessage: this.defaultMessage,
       vendorId: this.vendorId,
     }));
   }
@@ -58,6 +61,7 @@ class SellerInfo {
     this.senderName = '';
     this.phone = '';
     this.addr = '';
+    this.defaultMessage = '';
     this.vendorId = 1;
     this.vendor = getVendorById(1);
   }

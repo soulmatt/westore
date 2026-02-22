@@ -43,7 +43,7 @@ export class BaseMarketplace {
 
     this.orders.forEach(order => {
       const productName = this.getProductName(order);
-      const msg = this.getDeliveryMessage(order);
+      const msg = this.getDeliveryMessage(order, sellerInfo);
 
       if (sellerInfo.vendor.id === 1) {
         result.push({
@@ -129,8 +129,8 @@ export class BaseMarketplace {
     return this.getProductName(order);
   }
 
-  getDeliveryMessage(order) {
-    return order[this.columns.deliveryMessage] || '';
+  getDeliveryMessage(order, sellerInfo) {
+    return order[this.columns.deliveryMessage] || (sellerInfo && sellerInfo.defaultMessage) || '';
   }
 
   getCustomerOrderNumber(order, sellerInfo) {

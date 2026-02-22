@@ -24,38 +24,54 @@
   <div class="card seller-card mb-4">
     <div class="card-body">
       <h5 class="card-title mb-3"><i class="bi bi-truck"></i> 발송처 정보</h5>
-      <div class="row g-2 align-items-center mb-2">
+      <div class="row g-3 align-items-center mb-2">
         <div class="col-auto">
           <label for="senderName" class="col-form-label col-form-label-sm">발송처명</label>
         </div>
         <div class="col">
           <input type="text" class="form-control form-control-sm" id="senderName" placeholder="발송처명 입력">
-          <div class="invalid-feedback">발송처명을 입력해 주세요!</div>
         </div>
+        <div class="col-auto">
+          <small class="form-text text-danger d-none" id="senderNameError">발송처명을 입력해 주세요!</small>
+        </div>
+      </div>
+      <div class="row g-3 align-items-center mb-2">
         <div class="col-auto">
           <label for="storeTelephone" class="col-form-label col-form-label-sm">전화번호</label>
         </div>
         <div class="col">
           <input type="text" class="form-control form-control-sm" id="storeTelephone" placeholder="010-0000-0000">
-          <div class="invalid-feedback">전화번호를 입력해 주세요!</div>
+        </div>
+        <div class="col-auto">
+          <small class="form-text text-danger d-none" id="storeTelephoneError">전화번호를 입력해 주세요!</small>
         </div>
       </div>
-      <div class="row g-2 align-items-center">
+      <div class="row g-3 align-items-center mb-2">
         <div class="col-auto">
           <label for="storeAddress" class="col-form-label col-form-label-sm">주소</label>
         </div>
         <div class="col">
           <input type="text" class="form-control form-control-sm" id="storeAddress" placeholder="발송처 주소 입력">
-          <div class="invalid-feedback">주소를 입력해 주세요!</div>
+        </div>
+        <div class="col-auto">
+          <small class="form-text text-danger d-none" id="storeAddressError">주소를 입력해 주세요!</small>
+        </div>
+      </div>
+      <div class="row g-3 align-items-center mb-2">
+        <div class="col-auto">
+          <label for="defaultMessage" class="col-form-label col-form-label-sm">기본 배송메세지</label>
+        </div>
+        <div class="col">
+          <input type="text" class="form-control form-control-sm" id="defaultMessage" placeholder="주문 배송메세지가 없을 때 사용됩니다">
         </div>
       </div>
       <div class="row g-3 mt-1">
         <div class="col-md-12 d-flex align-items-end gap-2">
           <button type="button" class="btn btn-success btn-sm" id="btnSave">
-            <i class="bi bi-save"></i> 발송처 브라우저에 저장
+            <i class="bi bi-save"></i> <span id="btnSaveText">브라우저에 저장</span>
           </button>
           <button type="button" class="btn btn-outline-danger btn-sm" id="btnClear">
-            <i class="bi bi-trash"></i> 발송처 브라우저에서 삭제
+            <i class="bi bi-trash"></i> 브라우저에서 삭제
           </button>
         </div>
       </div>
