@@ -80,8 +80,8 @@ class MarketplaceRegistry {
   _getNowDate() {
     const d = new Date();
     const pad = n => n < 10 ? '0' + n : '' + n;
-    return '' + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate())
-      + '_' + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds());
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
+      + '_' + pad(d.getHours()) + '.' + pad(d.getMinutes()) + '.' + pad(d.getSeconds());
   }
 }
 

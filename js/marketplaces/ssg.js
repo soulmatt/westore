@@ -41,53 +41,15 @@ class SSG extends BaseMarketplace {
     return checkPhoneNumber(phone) ? phone : '';
   }
 
-  getPhone2Type2(order) {
-    return '';
-  }
-
-  matchInvoices(allInvoiceJson, sellerInfo) {
-    this.invoices = [];
-
-    if (sellerInfo.vendor.id === 1) {
-      this.orders.forEach(order => {
-        const orderNum = String(order["주문번호"] || '').replace(/ /g, '');
-        allInvoiceJson.forEach(invoice => {
-          const invoiceNum = String(invoice["고객주문번호"] || '').replace(/ /g, '');
-          if (invoiceNum === orderNum) {
-            this.invoices.push({
-              "no": order["순번"],
-              "배송번호": order["배송번호"],
-              "배송유형상세": order["배송유형"],
-              "택배사": sellerInfo.vendor.ssg.code,
-              "송장번호": String(invoice["운송장번호"] || '').replaceAll('-', ''),
-              "중량정보": '20',
-            });
-          }
-        });
-      });
-    }
-
-    if (sellerInfo.vendor.id === 2) {
-      this.orders.forEach(order => {
-        this.invoices.push({
-          "no": order["순번"],
-          "배송번호": order["배송번호"],
-          "배송유형상세": order["배송유형"],
-          "택배사": sellerInfo.vendor.ssg.code,
-          "송장번호": '',
-          "중량정보": '20',
-        });
-      });
-      allInvoiceJson.forEach(invoice => {
-        const orderNumber = String(invoice["고객주문번호"] || '');
-        if (!orderNumber) return;
-        this.orders.forEach((order, idx) => {
-          if (orderNumber.replace(/ /g, '') == order["주문번호"]) {
-            this.invoices[idx]["송장번호"] = String(invoice["운송장번호"] || '').replaceAll('-', '');
-          }
-        });
-      });
-    }
+  _buildInvoiceEntry(order, trackingNumber, sellerInfo) {
+    return {
+      "no": order["순번"],
+      "배송번호": order["배송번호"],
+      "배송유형상세": order["배송유형"],
+      "택배사": sellerInfo.vendor.ssg.code,
+      "송장번호": String(trackingNumber || '').replaceAll('-', ''),
+      "중량정보": '20',
+    };
   }
 }
 

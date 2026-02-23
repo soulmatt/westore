@@ -32,50 +32,19 @@ class Interpark extends BaseMarketplace {
     return headers[0] === '주문/발송관리';
   }
 
-  matchInvoices(allInvoiceJson, sellerInfo) {
-    this.invoices = [];
-
-    const buildEntry = (order, invoiceNumber) => {
-      const optionName = order["옵션명"] ? ' - ' + order["옵션명"] : '';
-      return {
-        "주문번호": order["주문번호"],
-        "주문순번": order["주문순번"],
-        "수령자": order["수령자명"],
-        "상품명": order["상품명"] + optionName,
-        "옵션명": order["옵션명"],
-        "결제일": order["결제일"],
-        "택배사코드": sellerInfo.vendor.interpark.code,
-        "수량": order["수량"],
-        "송장번호": invoiceNumber,
-      };
+  _buildInvoiceEntry(order, trackingNumber, sellerInfo) {
+    const optionName = order["옵션명"] ? ' - ' + order["옵션명"] : '';
+    return {
+      "주문번호": order["주문번호"],
+      "주문순번": order["주문순번"],
+      "수령자": order["수령자명"],
+      "상품명": order["상품명"] + optionName,
+      "옵션명": order["옵션명"],
+      "결제일": order["결제일"],
+      "택배사코드": sellerInfo.vendor.interpark.code,
+      "수량": order["수량"],
+      "송장번호": trackingNumber,
     };
-
-    if (sellerInfo.vendor.id === 1) {
-      this.orders.forEach(order => {
-        const orderNum = String(order["주문번호"] || '').replace(/ /g, '');
-        allInvoiceJson.forEach(invoice => {
-          const invoiceNum = String(invoice["고객주문번호"] || '').replace(/ /g, '');
-          if (invoiceNum === orderNum) {
-            this.invoices.push(buildEntry(order, invoice["운송장번호"]));
-          }
-        });
-      });
-    }
-
-    if (sellerInfo.vendor.id === 2) {
-      this.orders.forEach(order => {
-        this.invoices.push(buildEntry(order, ''));
-      });
-      allInvoiceJson.forEach(invoice => {
-        const orderNumber = String(invoice["고객주문번호"] || '');
-        if (!orderNumber) return;
-        this.invoices.forEach(inv => {
-          if (orderNumber.replace(/ /g, '') == inv["주문번호"]) {
-            inv["송장번호"] = invoice["운송장번호"];
-          }
-        });
-      });
-    }
   }
 }
 

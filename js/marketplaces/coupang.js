@@ -35,39 +35,12 @@ class Coupang extends BaseMarketplace {
     return '';
   }
 
-  matchInvoices(allInvoiceJson, sellerInfo) {
-    this.invoices = [];
-
-    if (sellerInfo.vendor.id === 1) {
-      this.orders.forEach(order => {
-        const orderNum = String(order["주문번호"] || '').replace(/ /g, '');
-        allInvoiceJson.forEach(invoice => {
-          const invoiceNum = String(invoice["고객주문번호"] || '').replace(/ /g, '');
-          if (invoiceNum === orderNum) {
-            const entry = { ...order };
-            entry["택배사"] = sellerInfo.vendor.coupang.viewName;
-            entry["운송장번호"] = invoice["운송장번호"];
-            this.invoices.push(entry);
-          }
-        });
-      });
-    }
-
-    if (sellerInfo.vendor.id === 2) {
-      this.orders.forEach(order => {
-        this.invoices.push({ ...order });
-      });
-      allInvoiceJson.forEach(invoice => {
-        const orderNumber = String(invoice["고객주문번호"] || '');
-        if (!orderNumber) return;
-        this.invoices.forEach(inv => {
-          if (orderNumber.replace(/ /g, '') == inv["주문번호"]) {
-            inv["택배사"] = sellerInfo.vendor.coupang.viewName;
-            inv["운송장번호"] = invoice["운송장번호"];
-          }
-        });
-      });
-    }
+  _buildInvoiceEntry(order, trackingNumber, sellerInfo) {
+    return {
+      ...order,
+      "택배사": sellerInfo.vendor.coupang.viewName,
+      "운송장번호": trackingNumber,
+    };
   }
 }
 

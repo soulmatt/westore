@@ -1,7 +1,7 @@
 /**
  * 마켓플레이스 베이스 클래스
- * 공통 로직: 발주서 파싱, CJ택배 양식 변환 (Type1/Type2)
- * 서브클래스에서 구현: detect(), matchInvoices()
+ * 공통 로직: 발주서 파싱, 택배 양식 변환, 송장 매칭
+ * 서브클래스에서 구현: detect(), _buildInvoiceEntry()
  */
 export class BaseMarketplace {
   constructor(config) {
@@ -36,63 +36,60 @@ export class BaseMarketplace {
     return this.orders;
   }
 
-  /** CJ택배 양식으로 변환 */
+  /** 택배 업로드 양식으로 변환 — 컬럼 에디터의 열 이름과 1:1 대응 */
   convertToInvoiceFormat(sellerInfo) {
     const result = [];
     const cols = this.columns;
 
     this.orders.forEach(order => {
-      const productName = this.getProductName(order);
-      const msg = this.getDeliveryMessage(order, sellerInfo);
-
-      if (sellerInfo.vendor.id === 1) {
-        result.push({
-          "받는분성명": order[cols.recipientName],
-          "받는분우편번호": order[cols.zipCode],
-          "받는분주소(전체,분할)": order[cols.address],
-          "받는분전화번호1": this.getPhone1(order),
-          "받는분전화번호2": this.getPhone2(order),
-          "품목명": productName,
-          "수량": order[cols.quantity],
-          "고객별자동합계총량": '',
-          "고객주문번호": this.getCustomerOrderNumber(order, sellerInfo),
-          "배송메세지": msg,
-          "신용": '신용',
-          "기본운임": '',
-          "업체명": sellerInfo.senderName,
-          "보내는분전화번호1": sellerInfo.phone,
-          "보내는분전화번호2": '',
-          "대리점명 업체명": sellerInfo.addr,
-        });
-      }
-
-      if (sellerInfo.vendor.id === 2) {
-        result.push({
-          "보내는사람(지정)": sellerInfo.senderName,
-          "주소(지정)": sellerInfo.addr,
-          "전화번호1(지정)": sellerInfo.phone,
-          "받는사람": order[cols.recipientName],
-          "전화번호1": this.getPhone1(order),
-          "주문자전화2": this.getPhone2Type2(order),
-          "우편번호": order[cols.zipCode],
-          "주소": order[cols.address],
-          "상품명1": this.getProductNameType2(order),
-          "상품상세1": '',
-          "내품수량1": order[cols.quantity],
-          "운임구분": '',
-          "운임": '',
-          "배송메시지": msg,
-          "고객주문번호": this.getCustomerOrderNumberType2(order, sellerInfo),
-        });
-      }
+      result.push({
+        "받는분성명": order[cols.recipientName],
+        "받는분우편번호": order[cols.zipCode],
+        "받는분주소(전체, 분할)": order[cols.address],
+        "받는분전화번호1": this.getPhone1(order),
+        "받는분전화번호2": this.getPhone2(order),
+        "상품명(옵션명)": this.getProductName(order),
+        "수량": order[cols.quantity],
+        "사용안함": '',
+        "주문번호": order[cols.orderNumber],
+        "배송메세지1": this.getDeliveryMessage(order, sellerInfo),
+        "운임구분": '신용',
+        "기본운임": '',
+        "보내는분성명": sellerInfo.senderName,
+        "보내는분전화번호1": sellerInfo.phone,
+        "보내는분전화번호2": '',
+        "보내는분주소(전체,분할)": sellerInfo.addr,
+      });
     });
 
     return result;
   }
 
-  /** 송장 매칭 - 서브클래스에서 구현 */
+  /** 송장 데이터를 Map으로 변환 (주문번호 → 운송장번호) */
+  _buildInvoiceMap(allInvoiceJson, sellerInfo) {
+    const { orderNumber: orderCol, trackingNumber: trackingCol } = sellerInfo.vendor.invoiceColumns;
+    const map = new Map();
+    allInvoiceJson.forEach(inv => {
+      const key = String(inv[orderCol] || '').replace(/ /g, '');
+      if (key) map.set(key, String(inv[trackingCol] || ''));
+    });
+    return map;
+  }
+
+  /** 기본 matchInvoices — 서브클래스는 _buildInvoiceEntry만 구현 */
   matchInvoices(allInvoiceJson, sellerInfo) {
+    const invoiceMap = this._buildInvoiceMap(allInvoiceJson, sellerInfo);
     this.invoices = [];
+    this.orders.forEach(order => {
+      const orderNum = String(order[this.columns.orderNumber] || '').replace(/ /g, '');
+      const trackingNumber = invoiceMap.get(orderNum) || '';
+      this.invoices.push(this._buildInvoiceEntry(order, trackingNumber, sellerInfo));
+    });
+  }
+
+  /** 서브클래스에서 구현: 마켓플레이스별 출력 형식 */
+  _buildInvoiceEntry(order, trackingNumber, sellerInfo) {
+    return {};
   }
 
   clearOrders() {
@@ -110,12 +107,6 @@ export class BaseMarketplace {
     return order[this.columns.phone2] || '';
   }
 
-  getPhone2Type2(order) {
-    const col = this.columns.phone2Type2;
-    if (col) return order[col] || '';
-    return this.getPhone2(order);
-  }
-
   getProductName(order) {
     const cols = this.columns;
     let name = order[cols.productName] || '';
@@ -125,64 +116,8 @@ export class BaseMarketplace {
     return name;
   }
 
-  getProductNameType2(order) {
-    return this.getProductName(order);
-  }
-
   getDeliveryMessage(order, sellerInfo) {
     return order[this.columns.deliveryMessage] || (sellerInfo && sellerInfo.defaultMessage) || '';
   }
 
-  getCustomerOrderNumber(order, sellerInfo) {
-    return order[this.columns.orderNumber];
-  }
-
-  getCustomerOrderNumberType2(order, sellerInfo) {
-    return this.getCustomerOrderNumber(order, sellerInfo);
-  }
-
-  // ---- 공통 송장 매칭 헬퍼 ----
-
-  _matchByOrderNumber(allInvoiceJson, sellerInfo, buildInvoiceEntry) {
-    this.invoices = [];
-
-    if (sellerInfo.vendor.id === 1) {
-      this.orders.forEach(order => {
-        const orderNum = String(order[this.columns.orderNumber] || '').replace(/ /g, '');
-        allInvoiceJson.forEach(invoice => {
-          const invoiceNum = String(invoice["고객주문번호"] || '').replace(/ /g, '');
-          if (invoiceNum === orderNum) {
-            this.invoices.push(buildInvoiceEntry(order, invoice, sellerInfo));
-          }
-        });
-      });
-    }
-
-    if (sellerInfo.vendor.id === 2) {
-      this._matchType2(allInvoiceJson, sellerInfo, buildInvoiceEntry);
-    }
-  }
-
-  _matchType2(allInvoiceJson, sellerInfo, buildInvoiceEntry) {
-    this.orders.forEach(order => {
-      this.invoices.push(buildInvoiceEntry(order, null, sellerInfo));
-    });
-    allInvoiceJson.forEach(invoice => {
-      const orderNumber = String(invoice["고객주문번호"] || '');
-      if (!orderNumber) return;
-      this.invoices.forEach(inv => {
-        if (this._matchType2OrderNumber(inv, orderNumber)) {
-          this._fillType2Invoice(inv, invoice, sellerInfo);
-        }
-      });
-    });
-  }
-
-  _matchType2OrderNumber(invoiceEntry, orderNumber) {
-    return false; // 서브클래스에서 구현
-  }
-
-  _fillType2Invoice(invoiceEntry, invoice, sellerInfo) {
-    // 서브클래스에서 구현
-  }
 }

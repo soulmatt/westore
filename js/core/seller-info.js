@@ -2,7 +2,7 @@
  * 발송처 정보 관리
  * 우선순위: URL 파라미터 > localStorage > 빈 값
  */
-import { getVendorById } from './vendor-config.js';
+import { getVendorById, CURRENT_VENDOR_ID } from './vendor-config.js';
 
 const STORAGE_KEY = 'westore_seller_info';
 
@@ -12,8 +12,8 @@ class SellerInfo {
     this.phone = '';
     this.addr = '';
     this.defaultMessage = '';
-    this.vendorId = 1;
-    this.vendor = getVendorById(1);
+    this.vendorId = CURRENT_VENDOR_ID;
+    this.vendor = getVendorById(CURRENT_VENDOR_ID);
     this._load();
   }
 
@@ -39,8 +39,8 @@ class SellerInfo {
         this.phone = data.phone || '';
         this.addr = data.addr || '';
         this.defaultMessage = data.defaultMessage || '';
-        this.vendorId = 1;
-        this.vendor = getVendorById(1);
+        this.vendorId = CURRENT_VENDOR_ID;
+        this.vendor = getVendorById(CURRENT_VENDOR_ID);
       } catch {
         // ignore
       }
@@ -63,8 +63,8 @@ class SellerInfo {
     this.phone = '';
     this.addr = '';
     this.defaultMessage = '';
-    this.vendorId = 1;
-    this.vendor = getVendorById(1);
+    this.vendorId = CURRENT_VENDOR_ID;
+    this.vendor = getVendorById(CURRENT_VENDOR_ID);
   }
 
   setVendorId(id) {

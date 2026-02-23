@@ -31,14 +31,8 @@ class St11 extends BaseMarketplace {
     return headers[0] && headers[0].includes('발송준비중내역');
   }
 
-  getPhone2Type2(order) {
-    return '';
-  }
-
-  matchInvoices(allInvoiceJson, sellerInfo) {
-    this.invoices = [];
-
-    const buildEntry = (order, invoiceNumber) => ({
+  _buildInvoiceEntry(order, trackingNumber, sellerInfo) {
+    return {
       "번호": order["번호"],
       "주문일시": order["주문일시"],
       "결제완료일": order["결제일시"],
@@ -46,37 +40,10 @@ class St11 extends BaseMarketplace {
       "주문상태": order["주문상태"],
       "배송번호": order["배송번호"],
       "택배사코드": sellerInfo.vendor.st11.code,
-      "송장/등기번호": invoiceNumber,
+      "송장/등기번호": trackingNumber,
       "배송방법": sellerInfo.vendor.st11.deliveryType,
       "상품번호": order["상품번호"],
-    });
-
-    if (sellerInfo.vendor.id === 1) {
-      this.orders.forEach(order => {
-        const orderNum = String(order["주문번호"] || '').replace(/ /g, '');
-        allInvoiceJson.forEach(invoice => {
-          const invoiceNum = String(invoice["고객주문번호"] || '').replace(/ /g, '');
-          if (invoiceNum === orderNum) {
-            this.invoices.push(buildEntry(order, invoice["운송장번호"]));
-          }
-        });
-      });
-    }
-
-    if (sellerInfo.vendor.id === 2) {
-      this.orders.forEach(order => {
-        this.invoices.push(buildEntry(order, ''));
-      });
-      allInvoiceJson.forEach(invoice => {
-        const orderNumber = String(invoice["고객주문번호"] || '');
-        if (!orderNumber) return;
-        this.orders.forEach((orderInfo, idx) => {
-          if (orderNumber.replace(/ /g, '') == orderInfo["주문번호"]) {
-            this.invoices[idx]["송장/등기번호"] = invoice["운송장번호"];
-          }
-        });
-      });
-    }
+    };
   }
 }
 

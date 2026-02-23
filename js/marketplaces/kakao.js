@@ -30,41 +30,13 @@ class Kakao extends BaseMarketplace {
     return headers[0] === '배송지/수신자정보 입력일';
   }
 
-  matchInvoices(allInvoiceJson, sellerInfo) {
-    this.invoices = [];
-
-    if (sellerInfo.vendor.id === 1) {
-      this.orders.forEach(order => {
-        const orderNum = String(order["주문번호"] || '').replace(/ /g, '');
-        allInvoiceJson.forEach(invoice => {
-          const invoiceNum = String(invoice["고객주문번호"] || '').replace(/ /g, '');
-          if (invoiceNum === orderNum) {
-            const entry = { ...order };
-            entry["배송방법"] = '택배배송';
-            entry["택배사코드"] = sellerInfo.vendor.kakao.code;
-            entry["송장번호"] = invoice["운송장번호"];
-            this.invoices.push(entry);
-          }
-        });
-      });
-    }
-
-    if (sellerInfo.vendor.id === 2) {
-      this.orders.forEach(order => {
-        this.invoices.push({ ...order });
-      });
-      allInvoiceJson.forEach(invoice => {
-        const orderNumber = String(invoice["고객주문번호"] || '');
-        if (!orderNumber) return;
-        this.invoices.forEach(inv => {
-          if (orderNumber.replace(/ /g, '') == inv["주문번호"]) {
-            inv["배송방법"] = '택배배송';
-            inv["택배사코드"] = sellerInfo.vendor.kakao.code;
-            inv["송장번호"] = invoice["운송장번호"];
-          }
-        });
-      });
-    }
+  _buildInvoiceEntry(order, trackingNumber, sellerInfo) {
+    return {
+      ...order,
+      "배송방법": '택배배송',
+      "택배사코드": sellerInfo.vendor.kakao.code,
+      "송장번호": trackingNumber,
+    };
   }
 }
 

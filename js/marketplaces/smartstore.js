@@ -30,55 +30,13 @@ class SmartStore extends BaseMarketplace {
     return headers[0] && headers[0].includes('엑셀 일괄발송');
   }
 
-  // Type2에서는 상품명에 옵션 미포함
-  getProductNameType2(order) {
-    return order[this.columns.productName] || '';
-  }
-
-  // Type2에서는 주문번호 컬럼이 다름
-  getCustomerOrderNumberType2(order) {
-    return order["주문번호"];
-  }
-
-  matchInvoices(allInvoiceJson, sellerInfo) {
-    this.invoices = [];
-
-    if (sellerInfo.vendor.id === 1) {
-      this.orders.forEach(order => {
-        const orderNum = String(order["상품주문번호"] || '').replace(/ /g, '');
-        allInvoiceJson.forEach(invoice => {
-          const invoiceNum = String(invoice["고객주문번호"] || '').replace(/ /g, '');
-          if (invoiceNum === orderNum) {
-            this.invoices.push({
-              "상품주문번호": order["상품주문번호"],
-              "배송방법": "택배,등기,소포",
-              "택배사": sellerInfo.vendor.smartStore.viewName,
-              "송장번호": invoice["운송장번호"],
-            });
-          }
-        });
-      });
-    }
-
-    if (sellerInfo.vendor.id === 2) {
-      this.orders.forEach(order => {
-        this.invoices.push({
-          "상품주문번호": order["상품주문번호"],
-          "배송방법": "택배,등기,소포",
-          "택배사": sellerInfo.vendor.smartStore.viewName,
-          "송장번호": '',
-        });
-      });
-      allInvoiceJson.forEach(invoice => {
-        const orderNumber = String(invoice["고객주문번호"] || '');
-        if (!orderNumber) return;
-        this.orders.forEach((order, idx) => {
-          if (orderNumber.replace(/ /g, '') == order["주문번호"]) {
-            this.invoices[idx]["송장번호"] = invoice["운송장번호"];
-          }
-        });
-      });
-    }
+  _buildInvoiceEntry(order, trackingNumber, sellerInfo) {
+    return {
+      "상품주문번호": order["상품주문번호"],
+      "배송방법": "택배,등기,소포",
+      "택배사": sellerInfo.vendor.smartStore.viewName,
+      "송장번호": trackingNumber,
+    };
   }
 }
 
