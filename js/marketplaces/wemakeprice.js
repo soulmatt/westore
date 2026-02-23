@@ -27,8 +27,8 @@ class WeMakePrice extends BaseMarketplace {
     });
   }
 
-  detect(headers) {
-    return headers[0] === '배송번호' && headers[1] === '주문번호';
+  detect(headerRows) {
+    return headerRows[0][0] === '배송번호' && headerRows[0][1] === '주문번호';
   }
 
   getPhone2(order) {

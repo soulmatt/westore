@@ -27,8 +27,8 @@ class SSG extends BaseMarketplace {
     });
   }
 
-  detect(headers) {
-    return headers[0] === '순번' && headers[1] === '출고유형';
+  detect(headerRows) {
+    return headerRows[0][0] === '순번' && headerRows[0][1] === '출고유형';
   }
 
   getPhone1(order) {

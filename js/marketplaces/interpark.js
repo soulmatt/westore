@@ -28,8 +28,8 @@ class Interpark extends BaseMarketplace {
     });
   }
 
-  detect(headers) {
-    return headers[0] === '주문/발송관리';
+  detect(headerRows) {
+    return headerRows[0][0] === '주문/발송관리';
   }
 
   _buildInvoiceEntry(order, trackingNumber, sellerInfo) {

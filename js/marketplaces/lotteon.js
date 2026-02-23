@@ -27,8 +27,8 @@ class LotteOn extends BaseMarketplace {
     });
   }
 
-  detect(headers) {
-    return headers[0] === '상품준비일시';
+  detect(headerRows) {
+    return headerRows[0][0] === '상품준비일시';
   }
 
   getPhone2(order) {

@@ -29,8 +29,8 @@ class Gmarket extends BaseMarketplace {
     this._auctionName = '옥션';
   }
 
-  detect(headers) {
-    return headers[0] === '아이디';
+  detect(headerRows) {
+    return headerRows[0][0] === '아이디';
   }
 
   // 지마켓/옥션 동적 판별

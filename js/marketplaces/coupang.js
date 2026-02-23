@@ -27,8 +27,8 @@ class Coupang extends BaseMarketplace {
     });
   }
 
-  detect(headers) {
-    return headers[0] === '묶음배송번호' || headers[1] === '묶음배송번호';
+  detect(headerRows) {
+    return headerRows[0][0] === '묶음배송번호' || headerRows[0][1] === '묶음배송번호';
   }
 
   getPhone2(order) {

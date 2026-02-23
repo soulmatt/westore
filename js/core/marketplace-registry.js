@@ -21,9 +21,9 @@ class MarketplaceRegistry {
   }
 
   detect(sheet) {
-    const headers = this._getFirstRowHeaders(sheet);
+    const headerRows = this._getHeaderRows(sheet, 3);
     for (const mp of this._marketplaces.values()) {
-      if (mp.detect(headers)) {
+      if (mp.detect(headerRows)) {
         return mp;
       }
     }
@@ -67,14 +67,24 @@ class MarketplaceRegistry {
     return files;
   }
 
-  _getFirstRowHeaders(sheet) {
-    const headers = [];
-    const range = XLSX.utils.decode_range(sheet['!ref']);
-    for (let C = range.s.c; C <= range.e.c; ++C) {
-      const cell = sheet[XLSX.utils.encode_cell({ c: C, r: 0 })];
-      headers.push(cell && cell.t ? XLSX.utils.format_cell(cell) : '');
+  /** 시트의 처음 N행을 2차원 배열로 반환 (항상 rowCount개 보장) */
+  _getHeaderRows(sheet, rowCount) {
+    if (!sheet || !sheet['!ref']) {
+      return Array.from({ length: rowCount }, () => []);
     }
-    return headers;
+    const range = XLSX.utils.decode_range(sheet['!ref']);
+    const rows = [];
+    const maxRow = Math.min(range.s.r + rowCount - 1, range.e.r);
+    for (let R = range.s.r; R <= maxRow; R++) {
+      const row = [];
+      for (let C = range.s.c; C <= range.e.c; C++) {
+        const cell = sheet[XLSX.utils.encode_cell({ c: C, r: R })];
+        row.push(cell && cell.t ? XLSX.utils.format_cell(cell) : '');
+      }
+      rows.push(row);
+    }
+    while (rows.length < rowCount) rows.push([]);
+    return rows;
   }
 
   _getNowDate() {

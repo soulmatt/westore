@@ -7,7 +7,7 @@ class St11 extends BaseMarketplace {
       id: 'st11',
       platformName: '11번가',
       invoiceFileName: '송장_11번가_',
-      parseRowOffset: 1,
+      parseRowOffset: 2,
       useDefval: false,
       columns: {
         recipientName: '수취인',
@@ -27,8 +27,9 @@ class St11 extends BaseMarketplace {
     });
   }
 
-  detect(headers) {
-    return headers[0] && headers[0].includes('발송준비중내역');
+  detect(headerRows) {
+    // 11번가는 Row 0이 안내 문구, Row 1이 '발송준비중내역'
+    return headerRows.some(row => row[0] && row[0].includes('발송준비중내역'));
   }
 
   _buildInvoiceEntry(order, trackingNumber, sellerInfo) {

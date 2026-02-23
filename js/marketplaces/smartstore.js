@@ -26,8 +26,8 @@ class SmartStore extends BaseMarketplace {
     });
   }
 
-  detect(headers) {
-    return headers[0] && headers[0].includes('엑셀 일괄발송');
+  detect(headerRows) {
+    return headerRows[0][0] && headerRows[0][0].includes('엑셀 일괄발송');
   }
 
   _buildInvoiceEntry(order, trackingNumber, sellerInfo) {

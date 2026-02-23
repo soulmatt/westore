@@ -22,7 +22,7 @@ export class BaseMarketplace {
   }
 
   /** 엑셀 헤더로 판매처 판별 - 서브클래스에서 구현 */
-  detect(headers) {
+  detect(headerRows) {
     return false;
   }
 

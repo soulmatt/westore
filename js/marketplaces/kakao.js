@@ -26,8 +26,8 @@ class Kakao extends BaseMarketplace {
     });
   }
 
-  detect(headers) {
-    return headers[0] === '배송지/수신자정보 입력일';
+  detect(headerRows) {
+    return headerRows[0][0] === '배송지/수신자정보 입력일';
   }
 
   _buildInvoiceEntry(order, trackingNumber, sellerInfo) {
