@@ -36,7 +36,7 @@ export class BaseMarketplace {
     return this.orders;
   }
 
-  /** 택배 업로드 양식으로 변환 — 컬럼 에디터의 열 이름과 1:1 대응 */
+  /** 택배 업로드 양식으로 변환 — 키 이름이 엑셀 열 이름으로 출력됨 */
   convertToInvoiceFormat(sellerInfo) {
     const result = [];
     const cols = this.columns;

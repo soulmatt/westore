@@ -8,14 +8,12 @@ import { statusDisplay } from './ui/status-display.js';
 import { formHandler } from './ui/form-handler.js';
 import { dropzoneHandler } from './ui/dropzone-handler.js';
 import { downloadHandler } from './ui/download-handler.js';
-import { columnEditor } from './ui/column-editor.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   statusDisplay.init();
   formHandler.init();
   dropzoneHandler.init();
   downloadHandler.init();
-  columnEditor.init();
 
   // 모달 닫힐 때 내부 포커스 해제 → aria-hidden 접근성 경고 방지
   document.addEventListener('hide.bs.modal', (e) => {

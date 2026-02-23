@@ -99,9 +99,6 @@
     <button type="button" class="btn btn-warning" id="downloadJob1Excel">
       <i class="bi bi-download"></i> 1번 파일 다운로드 (택배 양식 파일)
     </button>
-    <button type="button" class="btn btn-outline-secondary btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#columnEditorModal">
-      <i class="bi bi-columns-gap"></i> 택배 양식 수정
-    </button>
   </div>
 
   <!-- 2. 송장입력 -->
@@ -124,36 +121,10 @@
   <!-- 푸터 -->
   <div class="text-center mt-5 mb-4">
     <p class="text-muted small mb-1">업로드한 데이터는 아무데도 전송되지 않고 새로고침 시 삭제됩니다.</p>
-    <p class="text-muted small mb-0">v2026-02-23.1</p>
+    <p class="text-muted small mb-0">v2026-02-23.2</p>
   </div>
 </div>
 
-
-<!-- 컬럼 에디터 모달 -->
-<div class="modal fade" id="columnEditorModal" tabindex="-1" aria-labelledby="columnEditorModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title fw-bold" id="columnEditorModalLabel">
-          <i class="bi bi-columns-gap"></i> 택배 양식 열 순서 편집
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <small class="text-muted"><i class="bi bi-info-circle"></i> 변경 시 자동 저장됩니다</small>
-          <button type="button" class="btn btn-outline-secondary btn-sm" id="columnEditorResetBtn">
-            <i class="bi bi-arrow-counterclockwise"></i> 초기화
-          </button>
-        </div>
-        <div id="columnEditorList" class="column-editor-list"></div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- CDN 라이브러리 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

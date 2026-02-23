@@ -1,13 +1,12 @@
 /**
  * 다운로드 핸들러
- * - Job1: 발주서 → CJ택배 양식 다운로드
+ * - Job1: 발주서 → 택배 양식 다운로드
  * - Job2: 송장 → 각 마켓플레이스 발송처리 파일 다운로드
  */
 import { registry } from '../core/marketplace-registry.js';
 import { sellerInfo } from '../core/seller-info.js';
 import { getNowDateForFileName, s2ab, makeJob2WorkBook } from '../core/excel-utils.js';
 import { dropzoneHandler } from './dropzone-handler.js';
-import { columnEditor } from './column-editor.js';
 
 class DownloadHandler {
   init() {
@@ -38,16 +37,7 @@ class DownloadHandler {
     const vendor = sellerInfo.vendor;
     const fileName = '택배업로드용_' + getNowDateForFileName() + '.xlsx';
     const wb = XLSX.utils.book_new();
-
-    const columnOrder = columnEditor.getColumnOrder();
-    const header = columnOrder;
-    const aoa = [header];
-    invoiceFormat.forEach(row => {
-      aoa.push(columnOrder.map(colName =>
-        colName === '' ? '' : (row[colName] !== undefined ? row[colName] : '')
-      ));
-    });
-    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    const ws = XLSX.utils.json_to_sheet(invoiceFormat);
     XLSX.utils.book_append_sheet(wb, ws, vendor.sheetName);
     XLSX.writeFile(wb, fileName, { bookType: 'xlsx' });
   }
