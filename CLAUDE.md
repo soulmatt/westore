@@ -53,7 +53,8 @@ westore/
 `BaseMarketplace`를 상속하여 새 클래스를 만들고, `marketplaces/index.js`에 import 1줄 추가:
 
 1. `js/marketplaces/새마켓.js` 파일 생성
-2. `BaseMarketplace` 상속, `detect()` + `_buildInvoiceEntry()` 구현
+2. `BaseMarketplace` 상속, `detect(headerRows)` + `_buildInvoiceEntry()` 구현
+   - `headerRows`는 시트 처음 3행의 2차원 배열 (`headerRows[0]`이 Row 0, `headerRows[1]`이 Row 1, ...)
 3. `registry.register(new 새마켓())` 호출
 4. `js/marketplaces/index.js`에 `import './새마켓.js'` 추가
 
@@ -94,6 +95,8 @@ westore/
 ## 주의사항
 
 - `convertToInvoiceFormat()`의 키 이름이 곧 택배 업로드 파일의 열 이름 (코드에서 직접 관리)
+- `detect(headerRows)`는 2차원 배열을 받음 — `headerRows[0][0]`으로 접근 (1차원이 아님)
+- 11번가는 Row 0이 안내 문구, Row 1이 라벨, Row 2가 실제 헤더 (`parseRowOffset: 2`)
 - 스마트스토어의 `columns.orderNumber`는 `'상품주문번호'` (다른 마켓은 `'주문번호'`)
 - `vendor-config.js`의 `invoiceColumns`는 택배사 송장 파일의 실제 열 이름과 일치해야 함
 - 데이터는 서버로 전송되지 않음 (브라우저 전용)

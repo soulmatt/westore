@@ -28,7 +28,7 @@ index.html
 ```
 [발주서 엑셀] → Dropzone addedfile
   → readSheetFromFile()
-  → registry.detect(sheet)            // 헤더로 마켓플레이스 자동 판별
+  → registry.detect(sheet)            // 처음 3행 헤더로 마켓플레이스 자동 판별
   → marketplace.parseOrders(sheet)     // XLSX.utils.sheet_to_json
   → statusDisplay.showOrderStatus()
 
@@ -61,7 +61,7 @@ index.html
 
 | 메서드 | 역할 |
 |--------|------|
-| `detect(headers)` | 엑셀 첫 행 헤더로 마켓플레이스 판별 (서브클래스 구현) |
+| `detect(headerRows)` | 엑셀 처음 3행(2차원 배열)으로 마켓플레이스 판별 (서브클래스 구현) |
 | `parseOrders(sheet)` | 발주서 시트를 JSON 배열로 파싱 |
 | `convertToInvoiceFormat(sellerInfo)` | 택배 업로드 양식으로 변환 (키 이름 = 엑셀 열 이름) |
 | `_buildInvoiceMap(allInvoiceJson, sellerInfo)` | 송장 데이터를 Map(주문번호→운송장번호)으로 변환 |
@@ -108,19 +108,19 @@ const CURRENT_VENDOR_ID = 2;
 
 ## 마켓플레이스 감지 로직
 
-각 마켓플레이스는 발주서 엑셀의 첫 행 헤더 값으로 판별됩니다:
+`detect(headerRows)`는 시트 처음 3행을 2차원 배열로 받아 판별합니다. `headerRows[N][M]`은 Row N, Col M입니다.
 
-| 마켓플레이스 | 감지 조건 |
-|-------------|-----------|
-| 스마트스토어 | `headers[0].includes('엑셀 일괄발송')` |
-| 쿠팡 | `headers[0] === '묶음배송번호'` or `headers[1] === '묶음배송번호'` |
-| 지마켓/옥션 | `headers[0] === '아이디'` |
-| 11번가 | `headers[0].includes('발송준비중내역')` |
-| 카카오 | `headers[0] === '배송지/수신자정보 입력일'` |
-| 롯데on | `headers[0] === '상품준비일시'` |
-| SSG | `headers[0] === '순번' && headers[1] === '출고유형'` |
-| 인터파크 | `headers[0] === '주문/발송관리'` |
-| 위메프 | `headers[0] === '배송번호' && headers[1] === '주문번호'` |
+| 마켓플레이스 | 감지 조건 | parseRowOffset |
+|-------------|-----------|:--------------:|
+| 스마트스토어 | `headerRows[0][0].includes('엑셀 일괄발송')` | 1 |
+| 쿠팡 | `headerRows[0][0] === '묶음배송번호'` or `headerRows[0][1] === '묶음배송번호'` | 0 |
+| 지마켓/옥션 | `headerRows[0][0] === '아이디'` | 0 |
+| 11번가 | `headerRows.some(row => row[0].includes('발송준비중내역'))` | 2 |
+| 카카오 | `headerRows[0][0] === '배송지/수신자정보 입력일'` | 0 |
+| 롯데on | `headerRows[0][0] === '상품준비일시'` | 0 |
+| SSG | `headerRows[0][0] === '순번' && headerRows[0][1] === '출고유형'` | 0 |
+| 인터파크 | `headerRows[0][0] === '주문/발송관리'` | 5 |
+| 위메프 | `headerRows[0][0] === '배송번호' && headerRows[0][1] === '주문번호'` | 0 |
 
 ## Job2 출력 형식 (마켓플레이스별)
 
