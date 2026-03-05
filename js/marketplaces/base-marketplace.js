@@ -26,13 +26,13 @@ export class BaseMarketplace {
     return false;
   }
 
-  /** 발주서 파싱 */
+  /** 발주서 파싱 (같은 마켓플레이스의 여러 발주서를 누적) */
   parseOrders(sheet) {
-    this.orders = [];
     const options = {};
     if (this.useDefval) options.defval = '';
     if (this.parseRowOffset > 0) options.range = this.parseRowOffset;
-    this.orders = XLSX.utils.sheet_to_json(sheet, options);
+    const newOrders = XLSX.utils.sheet_to_json(sheet, options);
+    this.orders.push(...newOrders);
     return this.orders;
   }
 
