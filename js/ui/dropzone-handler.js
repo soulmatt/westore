@@ -38,7 +38,7 @@ class DropzoneHandler {
       init: function () {
         this.on('addedfile', (file) => {
           readSheetFromFile(file).then(sheet => {
-            handleOrderExcel(sheet);
+            handleOrderExcel(sheet, file.name);
           });
         });
 
@@ -48,7 +48,7 @@ class DropzoneHandler {
           const files = this.files;
           files.forEach(f => {
             readSheetFromFile(f).then(sheet => {
-              handleOrderExcel(sheet);
+              handleOrderExcel(sheet, f.name);
             });
           });
         });
@@ -84,11 +84,11 @@ class DropzoneHandler {
   }
 }
 
-function handleOrderExcel(sheet) {
+function handleOrderExcel(sheet, sourceFileName) {
   const marketplace = registry.detect(sheet);
   if (marketplace) {
-    marketplace.parseOrders(sheet);
-    statusDisplay.showOrderStatus(marketplace.platformName, marketplace.orders.length);
+    const newOrders = marketplace.parseOrders(sheet, sourceFileName);
+    statusDisplay.showOrderStatus(marketplace.platformName, newOrders.length);
   } else {
     statusDisplay.showOrderError('미지원 발주서');
     alert('미지원 발주서가 존재합니다.\n해당 파일은 무시됩니다.');

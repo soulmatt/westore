@@ -52,15 +52,34 @@ class MarketplaceRegistry {
 
   getJob2Files(sellerInfo) {
     const files = [];
+    const nowDate = this._getNowDate();
     for (const mp of this._marketplaces.values()) {
-      if (mp.invoices.length > 0) {
+      if (mp.invoices.length === 0) continue;
+
+      if (mp.orderGroups.length <= 1) {
+        // 단일 파일: 기존과 동일
         files.push({
           marketplace: mp,
           data: mp.invoices,
-          fileName: mp.invoiceFileName + this._getNowDate() + '.' + mp.job2FileType,
+          fileName: mp.invoiceFileName + nowDate + '.' + mp.job2FileType,
           sheetName: mp.job2SheetName,
           fileType: mp.job2FileType,
           origin: mp.job2Origin,
+        });
+      } else {
+        // 다중 파일: 그룹별 분리, 파일명에 원본 발주서명 포함
+        mp.orderGroups.forEach(group => {
+          if (group.invoices.length > 0) {
+            const baseName = group.sourceFileName.replace(/\.[^.]+$/, '');
+            files.push({
+              marketplace: mp,
+              data: group.invoices,
+              fileName: mp.invoiceFileName + baseName + '_' + nowDate + '.' + mp.job2FileType,
+              sheetName: mp.job2SheetName,
+              fileType: mp.job2FileType,
+              origin: mp.job2Origin,
+            });
+          }
         });
       }
     }

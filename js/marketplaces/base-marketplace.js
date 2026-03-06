@@ -17,6 +17,7 @@ export class BaseMarketplace {
     this.job2FileType = config.job2FileType || 'xlsx';
     this.job2Origin = config.job2Origin || undefined;
 
+    this.orderGroups = [];
     this.orders = [];
     this.invoices = [];
   }
@@ -26,14 +27,15 @@ export class BaseMarketplace {
     return false;
   }
 
-  /** 발주서 파싱 (같은 마켓플레이스의 여러 발주서를 누적) */
-  parseOrders(sheet) {
+  /** 발주서 파싱 (파일별 그룹으로 누적) */
+  parseOrders(sheet, sourceFileName) {
     const options = {};
     if (this.useDefval) options.defval = '';
     if (this.parseRowOffset > 0) options.range = this.parseRowOffset;
     const newOrders = XLSX.utils.sheet_to_json(sheet, options);
-    this.orders.push(...newOrders);
-    return this.orders;
+    this.orderGroups.push({ sourceFileName: sourceFileName || '', orders: newOrders, invoices: [] });
+    this.orders = this.orderGroups.flatMap(g => g.orders);
+    return newOrders;
   }
 
   /** 택배 업로드 양식으로 변환 — 키 이름이 엑셀 열 이름으로 출력됨 */
@@ -76,15 +78,20 @@ export class BaseMarketplace {
     return map;
   }
 
-  /** 기본 matchInvoices — 서브클래스는 _buildInvoiceEntry만 구현 */
+  /** 기본 matchInvoices — 그룹별로 invoices 생성 */
   matchInvoices(allInvoiceJson, sellerInfo) {
     const invoiceMap = this._buildInvoiceMap(allInvoiceJson, sellerInfo);
     this.invoices = [];
-    this.orders.forEach(order => {
-      const orderNum = String(order[this.columns.orderNumber] || '').replace(/ /g, '');
-      const trackingNumber = invoiceMap.get(orderNum) || '';
-      this.invoices.push(this._buildInvoiceEntry(order, trackingNumber, sellerInfo));
-    });
+    for (const group of this.orderGroups) {
+      group.invoices = [];
+      for (const order of group.orders) {
+        const orderNum = String(order[this.columns.orderNumber] || '').replace(/ /g, '');
+        const trackingNumber = invoiceMap.get(orderNum) || '';
+        const entry = this._buildInvoiceEntry(order, trackingNumber, sellerInfo);
+        group.invoices.push(entry);
+        this.invoices.push(entry);
+      }
+    }
   }
 
   /** 서브클래스에서 구현: 마켓플레이스별 출력 형식 */
@@ -93,6 +100,7 @@ export class BaseMarketplace {
   }
 
   clearOrders() {
+    this.orderGroups = [];
     this.orders = [];
     this.invoices = [];
   }
