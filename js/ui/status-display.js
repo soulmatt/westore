@@ -1,27 +1,13 @@
 /**
- * 처리 상태 표시 관리
+ * 처리 상태 표시 관리 (송장 상태 전용)
  */
 class StatusDisplay {
   constructor() {
-    this._orderStatus = null;
     this._invoiceStatus = null;
   }
 
   init() {
-    this._orderStatus = document.getElementById('orderStatus');
     this._invoiceStatus = document.getElementById('invoiceStatus');
-  }
-
-  showOrderStatus(marketplaceName, orderCount) {
-    this._appendBadge(this._orderStatus, `${marketplaceName}(${orderCount}건)`, 'bg-success');
-  }
-
-  showOrderError(message) {
-    this._appendBadge(this._orderStatus, message, 'bg-danger');
-  }
-
-  clearOrderStatus() {
-    if (this._orderStatus) this._orderStatus.innerHTML = '';
   }
 
   showInvoiceStatus(message) {

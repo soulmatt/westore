@@ -26,6 +26,76 @@ body {
 #orderDropZone {
   background-color: #ffc107;
   border-color: #6c757d !important;
+  min-height: 176px !important;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-content: flex-start;
+}
+
+#orderDropZone .dz-message {
+  width: 100%;
+  text-align: center;
+}
+
+/* 발주서 파일 목록: 한 줄 인라인 레이아웃 */
+#orderDropZone .dz-preview {
+  display: inline-flex !important;
+  align-items: center;
+  width: auto !important;
+  min-height: 0 !important;
+  margin: 4px !important;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+#orderDropZone .dz-preview .dz-image,
+#orderDropZone .dz-preview .dz-success-mark,
+#orderDropZone .dz-preview .dz-error-mark,
+#orderDropZone .dz-preview .dz-error-message,
+#orderDropZone .dz-preview .dz-size {
+  display: none !important;
+}
+
+#orderDropZone .dz-preview .dz-details {
+  display: inline;
+  opacity: 1 !important;
+  padding: 0 !important;
+  min-width: 0;
+  position: static !important;
+  font-size: 14px;
+}
+
+#orderDropZone .dz-preview .dz-filename {
+  display: inline;
+  white-space: nowrap;
+  font-size: 14px;
+  color: #333;
+}
+
+#orderDropZone .dz-preview .dz-filename span {
+  cursor: default;
+}
+
+#orderDropZone .dz-preview .dz-badge {
+  flex-shrink: 0;
+  margin-right: 8px;
+  font-size: 12px;
+}
+
+#orderDropZone .dz-preview .dz-remove {
+  margin-left: 8px;
+  font-size: 12px;
+  color: #dc3545;
+  text-decoration: none;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+#orderDropZone .dz-preview .dz-remove:hover {
+  color: #a71d2a;
 }
 
 /* 송장 드롭존 */

@@ -28,28 +28,39 @@ class DropzoneHandler {
 
   _initOrderDropzone() {
     const el = document.getElementById('orderDropZone');
+    const orderPreviewTemplate = `
+      <div class="dz-preview dz-file-preview">
+        <span class="dz-badge"></span>
+        <div class="dz-details"><div class="dz-filename"><span data-dz-name></span></div></div>
+        <a class="dz-remove" href="javascript:undefined;" data-dz-remove>✕</a>
+      </div>`;
     this.orderDropzone = new Dropzone(el, {
       url: './',
       autoProcessQueue: false,
       maxFiles: 20,
       uploadMultiple: true,
       acceptedFiles: '.xlsx,.xls',
-      addRemoveLinks: true,
+      previewTemplate: orderPreviewTemplate,
       init: function () {
         this.on('addedfile', (file) => {
           readSheetFromFile(file).then(sheet => {
-            handleOrderExcel(sheet, file.name);
+            handleOrderExcel(sheet, file);
+          }).catch(() => {
+            handleOrderExcelError(file);
           });
         });
 
         this.on('removedfile', function () {
           registry.clearAllOrders();
-          statusDisplay.clearOrderStatus();
           const files = [...this.files];
           (async () => {
             for (const f of files) {
-              const sheet = await readSheetFromFile(f);
-              handleOrderExcel(sheet, f.name);
+              try {
+                const sheet = await readSheetFromFile(f);
+                handleOrderExcel(sheet, f);
+              } catch {
+                handleOrderExcelError(f);
+              }
             }
           })();
         });
@@ -85,13 +96,28 @@ class DropzoneHandler {
   }
 }
 
-function handleOrderExcel(sheet, sourceFileName) {
+function handleOrderExcelError(file) {
+  const badgeEl = file.previewElement && file.previewElement.querySelector('.dz-badge');
+  if (badgeEl) {
+    badgeEl.textContent = '읽기 실패';
+    badgeEl.className = 'dz-badge badge bg-danger';
+  }
+}
+
+function handleOrderExcel(sheet, file) {
+  const badgeEl = file.previewElement && file.previewElement.querySelector('.dz-badge');
   const marketplace = registry.detect(sheet);
   if (marketplace) {
-    const newOrders = marketplace.parseOrders(sheet, sourceFileName);
-    statusDisplay.showOrderStatus(marketplace.platformName, newOrders.length);
+    const newOrders = marketplace.parseOrders(sheet, file.name);
+    if (badgeEl) {
+      badgeEl.textContent = `${marketplace.platformName}(${newOrders.length}건)`;
+      badgeEl.className = 'dz-badge badge bg-success';
+    }
   } else {
-    statusDisplay.showOrderError('미지원 발주서');
+    if (badgeEl) {
+      badgeEl.textContent = '미지원';
+      badgeEl.className = 'dz-badge badge bg-danger';
+    }
     alert('미지원 발주서가 존재합니다.\n해당 파일은 무시됩니다.');
   }
 }
