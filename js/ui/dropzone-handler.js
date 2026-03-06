@@ -45,12 +45,13 @@ class DropzoneHandler {
         this.on('removedfile', function () {
           registry.clearAllOrders();
           statusDisplay.clearOrderStatus();
-          const files = this.files;
-          files.forEach(f => {
-            readSheetFromFile(f).then(sheet => {
+          const files = [...this.files];
+          (async () => {
+            for (const f of files) {
+              const sheet = await readSheetFromFile(f);
               handleOrderExcel(sheet, f.name);
-            });
-          });
+            }
+          })();
         });
 
         this.on('dragover', () => el.style.opacity = '0.7');
