@@ -15,7 +15,7 @@ export class BaseMarketplace {
     // Job2 출력 설정
     this.job2SheetName = config.job2SheetName || 'Sheet1';
     this.job2FileType = config.job2FileType || 'xlsx';
-    this.job2Origin = config.job2Origin || undefined;
+    this.job2Origin = config.job2Origin;
 
     this.orderGroups = [];
     this.orders = [];
@@ -29,10 +29,11 @@ export class BaseMarketplace {
 
   /** 발주서 파싱 (파일별 그룹으로 누적) */
   parseOrders(sheet, sourceFileName) {
-    const options = {};
+    const options = { raw: false };
     if (this.useDefval) options.defval = '';
     if (this.parseRowOffset > 0) options.range = this.parseRowOffset;
     const newOrders = XLSX.utils.sheet_to_json(sheet, options);
+    this._warnScientificNotation(newOrders);
     this.orderGroups.push({ sourceFileName: sourceFileName || '', orders: newOrders, invoices: [] });
     this.orders = this.orderGroups.flatMap(g => g.orders);
     return newOrders;
@@ -53,7 +54,7 @@ export class BaseMarketplace {
         "상품명(옵션명)": this.getProductName(order),
         "수량": order[cols.quantity],
         "사용안함": '',
-        "주문번호": order[cols.orderNumber],
+        "주문번호": String(order[cols.orderNumber] || '').replace(/[ ,]/g, ''),
         "배송메세지1": this.getDeliveryMessage(order, sellerInfo),
         "운임구분": '신용',
         "기본운임": '',
@@ -72,8 +73,8 @@ export class BaseMarketplace {
     const { orderNumber: orderCol, trackingNumber: trackingCol } = sellerInfo.vendor.invoiceColumns;
     const map = new Map();
     allInvoiceJson.forEach(inv => {
-      const key = String(inv[orderCol] || '').replace(/ /g, '');
-      if (key) map.set(key, String(inv[trackingCol] || ''));
+      const key = String(inv[orderCol] || '').replace(/[ ,]/g, '');
+      if (key) map.set(key, String(inv[trackingCol] || '').replace(/[ ,]/g, ''));
     });
     return map;
   }
@@ -85,7 +86,7 @@ export class BaseMarketplace {
     for (const group of this.orderGroups) {
       group.invoices = [];
       for (const order of group.orders) {
-        const orderNum = String(order[this.columns.orderNumber] || '').replace(/ /g, '');
+        const orderNum = String(order[this.columns.orderNumber] || '').replace(/[ ,]/g, '');
         const trackingNumber = invoiceMap.get(orderNum) || '';
         const entry = this._buildInvoiceEntry(order, trackingNumber, sellerInfo);
         group.invoices.push(entry);
@@ -103,6 +104,19 @@ export class BaseMarketplace {
     this.orderGroups = [];
     this.orders = [];
     this.invoices = [];
+  }
+
+  /** 주문번호에 과학적 표기법(E+)이 포함되면 경고 */
+  _warnScientificNotation(orders) {
+    const col = this.columns.orderNumber;
+    const bad = orders.find(o => /E\+/i.test(String(o[col] || '')));
+    if (bad) {
+      alert(
+        `[${this.platformName}] 주문번호가 과학적 표기법(예: 2.02E+15)으로 읽혔습니다.\n` +
+        `엑셀 원본에서 주문번호 열이 "텍스트" 서식인지 확인해주세요.\n` +
+        `해결되지 않으면 개발자에게 문의해주세요.`
+      );
+    }
   }
 
   // ---- 헬퍼 메서드 (서브클래스에서 필요 시 오버라이드) ----
