@@ -41,6 +41,7 @@ export function readSheetFromFile(file) {
       // 1) 비밀번호 없이 SheetJS로 직접 시도
       try {
         const wb = XLSX.read(data, { type: 'array' });
+        fixLargeNumbers(wb.Sheets[wb.SheetNames[0]]);
         return resolve(wb.Sheets[wb.SheetNames[0]]);
       } catch (plainErr) {
         // 파싱 실패 → 암호화 파일일 수 있으므로 복호화 시도
@@ -79,7 +80,29 @@ async function decryptAndParse(data, password) {
   const wb = await XlsxPopulate.fromDataAsync(new Uint8Array(data), { password });
   const decryptedData = await wb.outputAsync({ type: 'arraybuffer' });
   const sheetjsWb = XLSX.read(decryptedData, { type: 'array' });
+  fixLargeNumbers(sheetjsWb.Sheets[sheetjsWb.SheetNames[0]]);
   return sheetjsWb.Sheets[sheetjsWb.SheetNames[0]];
+}
+
+/**
+ * sheet 내 큰 정수 셀을 문자열 셀로 변환 (정밀도 손실 방지)
+ * JS Number는 2^53까지 정확하므로, 그 범위 내 정수를 문자열로 강제 변환
+ */
+export function fixLargeNumbers(sheet) {
+  const range = XLSX.utils.decode_range(sheet['!ref'] || 'A1');
+  for (let R = range.s.r; R <= range.e.r; R++) {
+    for (let C = range.s.c; C <= range.e.c; C++) {
+      const addr = XLSX.utils.encode_cell({ r: R, c: C });
+      const cell = sheet[addr];
+      if (!cell || cell.t !== 'n') continue;
+      // 정수이고 10자리 이상이면 문자열로 변환
+      if (Number.isInteger(cell.v) && Math.abs(cell.v) >= 1e9) {
+        cell.t = 's';
+        cell.v = String(cell.v);
+        delete cell.w;
+      }
+    }
+  }
 }
 
 export function checkPhoneNumber(str) {

@@ -29,7 +29,7 @@ export class BaseMarketplace {
 
   /** 발주서 파싱 (파일별 그룹으로 누적) */
   parseOrders(sheet, sourceFileName) {
-    const options = { raw: false };
+    const options = {};
     if (this.useDefval) options.defval = '';
     if (this.parseRowOffset > 0) options.range = this.parseRowOffset;
     const newOrders = XLSX.utils.sheet_to_json(sheet, options);
@@ -54,7 +54,7 @@ export class BaseMarketplace {
         "상품명(옵션명)": this.getProductName(order),
         "수량": order[cols.quantity],
         "사용안함": '',
-        "주문번호": String(order[cols.orderNumber] || '').replace(/[ ,]/g, ''),
+        "주문번호": String(order[cols.orderNumber] || '').replace(/ /g, ''),
         "배송메세지1": this.getDeliveryMessage(order, sellerInfo),
         "운임구분": '신용',
         "기본운임": '',
@@ -73,8 +73,8 @@ export class BaseMarketplace {
     const { orderNumber: orderCol, trackingNumber: trackingCol } = sellerInfo.vendor.invoiceColumns;
     const map = new Map();
     allInvoiceJson.forEach(inv => {
-      const key = String(inv[orderCol] || '').replace(/[ ,]/g, '');
-      if (key) map.set(key, String(inv[trackingCol] || '').replace(/[ ,]/g, ''));
+      const key = String(inv[orderCol] || '').replace(/ /g, '');
+      if (key) map.set(key, String(inv[trackingCol] || '').replace(/ /g, ''));
     });
     return map;
   }
@@ -86,7 +86,7 @@ export class BaseMarketplace {
     for (const group of this.orderGroups) {
       group.invoices = [];
       for (const order of group.orders) {
-        const orderNum = String(order[this.columns.orderNumber] || '').replace(/[ ,]/g, '');
+        const orderNum = String(order[this.columns.orderNumber] || '').replace(/ /g, '');
         const trackingNumber = invoiceMap.get(orderNum) || '';
         const entry = this._buildInvoiceEntry(order, trackingNumber, sellerInfo);
         group.invoices.push(entry);

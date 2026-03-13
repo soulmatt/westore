@@ -124,7 +124,7 @@ function handleOrderExcel(sheet, file) {
 
 function handleInvoiceExcel(sheet) {
   statusDisplay.clearInvoiceStatus();
-  const allInvoiceJson = XLSX.utils.sheet_to_json(sheet, { defval: '', raw: false });
+  const allInvoiceJson = XLSX.utils.sheet_to_json(sheet, { defval: '' });
   registry.matchAllInvoices(allInvoiceJson, sellerInfo);
 
   const files = registry.getJob2Files(sellerInfo);
