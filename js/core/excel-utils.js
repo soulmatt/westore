@@ -95,10 +95,10 @@ export function fixLargeNumbers(sheet) {
       const addr = XLSX.utils.encode_cell({ r: R, c: C });
       const cell = sheet[addr];
       if (!cell || cell.t !== 'n') continue;
-      // 정수이고 10자리 이상이면 문자열로 변환
-      if (Number.isInteger(cell.v) && Math.abs(cell.v) >= 1e9) {
+      // 10자리 이상 큰 숫자면 문자열로 변환 (부동소수점 아티팩트 포함)
+      if (Math.abs(cell.v) >= 1e9 && Math.abs(cell.v) <= Number.MAX_SAFE_INTEGER) {
         cell.t = 's';
-        cell.v = String(cell.v);
+        cell.v = String(Math.round(cell.v));
         delete cell.w;
       }
     }
