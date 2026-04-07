@@ -31,7 +31,7 @@ westore/
 │   │   ├── index.js              # 전체 마켓플레이스 import (자동 등록)
 │   │   ├── smartstore.js         # 스마트스토어
 │   │   ├── coupang.js            # 쿠팡
-│   │   ├── gmarket.js            # 지마켓/옥션
+│   │   ├── esm.js                # ESM (지마켓/옥션)
 │   │   ├── st11.js               # 11번가
 │   │   ├── kakao.js              # 카카오톡스토어
 │   │   ├── lotteon.js            # 롯데on

@@ -5,7 +5,7 @@
 import './smartstore.js';
 import './coupang.js';
 import './st11.js';
-import './gmarket.js';
+import './esm.js';
 import './kakao.js';
 import './lotteon.js';
 import './ssg.js';

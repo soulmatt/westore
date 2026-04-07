@@ -8,7 +8,7 @@ index.html
         ├── js/marketplaces/index.js (마켓플레이스 자동 등록)
         │     ├── smartstore.js → registry.register()
         │     ├── coupang.js    → registry.register()
-        │     ├── gmarket.js    → registry.register()
+        │     ├── esm.js        → registry.register()
         │     ├── st11.js       → registry.register()
         │     ├── kakao.js      → registry.register()
         │     ├── lotteon.js    → registry.register()
