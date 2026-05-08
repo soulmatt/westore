@@ -506,22 +506,21 @@ async function saveAsImage() {
 
   try {
     const el = document.getElementById('tab-personal');
+    const responsiveDivs = el.querySelectorAll('.table-responsive');
 
-    // 여백용 래퍼에 클론 삽입 후 캡처
-    const wrapper = document.createElement('div');
-    wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;background:#fff;padding:32px;width:' + el.offsetWidth + 'px;box-sizing:content-box';
-    const clone = el.cloneNode(true);
-    clone.querySelectorAll('.table-responsive').forEach(d => { d.style.overflow = 'visible'; });
-    wrapper.appendChild(clone);
-    document.body.appendChild(wrapper);
+    el.style.padding = '32px';
+    el.style.background = '#fff';
+    responsiveDivs.forEach(d => { d.style.overflow = 'visible'; });
 
-    const canvas = await html2canvas(wrapper, {
+    const canvas = await html2canvas(el, {
       backgroundColor: '#ffffff',
       scale: 2,
       useCORS: true,
     });
 
-    document.body.removeChild(wrapper);
+    el.style.padding = '';
+    el.style.background = '';
+    responsiveDivs.forEach(d => { d.style.overflow = ''; });
 
     const link = document.createElement('a');
     link.download = `택배비정산_${new Date().toISOString().slice(0, 10)}.png`;
