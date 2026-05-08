@@ -55,7 +55,12 @@
   <!-- 결과 -->
   <div id="resultsSection" class="d-none mt-4">
     <hr class="my-4">
-    <h5 class="mb-3">정산 결과</h5>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">정산 결과</h5>
+      <button id="saveImageBtn" class="btn btn-outline-secondary btn-sm" onclick="saveAsImage()">
+        <i class="bi bi-image"></i> 이미지로 저장
+      </button>
+    </div>
     <ul class="nav nav-pills mb-3" id="resultTabs">
       <li class="nav-item">
         <a class="nav-link active" href="#" data-tab="personal" onclick="switchTab('personal');return false;">정산</a>
@@ -75,6 +80,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
 const personMappingData = {
   정대원: ['몽이네잡화*', '디라운드주식회*'],
@@ -130,7 +136,7 @@ function renderPersonMappingList() {
         value="${escapeHtml(personMappingData[person].join(', '))}"
         placeholder="발송처명을 쉼표로 구분"
         oninput="updatePersonStores('${escapeHtml(person)}', this.value)">
-      <button class="btn btn-outline-danger btn-sm" onclick="removePersonMapping('${escapeHtml(person)}')">삭제</button>
+      <button class="btn btn-outline-danger btn-sm flex-shrink-0" style="white-space:nowrap" onclick="removePersonMapping('${escapeHtml(person)}')">삭제</button>
     </div>`).join('');
 }
 
@@ -490,6 +496,40 @@ function renderRankingTab() {
     </div>`;
 
   document.getElementById('tab-ranking').innerHTML = html;
+}
+
+async function saveAsImage() {
+  if (!currentResults) { showMessage('정산 결과가 없습니다.', 'error'); return; }
+  const btn = document.getElementById('saveImageBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span>저장 중...';
+
+  try {
+    const el = document.getElementById('tab-personal');
+    // table-responsive의 overflow를 일시적으로 해제해 잘리지 않도록
+    const responsiveDivs = el.querySelectorAll('.table-responsive');
+    responsiveDivs.forEach(d => { d.style.overflow = 'visible'; });
+
+    const canvas = await html2canvas(el, {
+      backgroundColor: '#ffffff',
+      scale: 2,
+      useCORS: true,
+      scrollX: 0,
+      scrollY: -window.scrollY,
+    });
+
+    responsiveDivs.forEach(d => { d.style.overflow = ''; });
+
+    const link = document.createElement('a');
+    link.download = `택배비정산_${new Date().toISOString().slice(0, 10)}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } catch (err) {
+    showMessage('이미지 저장 실패: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-image"></i> 이미지로 저장';
+  }
 }
 
 // 드래그 앤 드롭
