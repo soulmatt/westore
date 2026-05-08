@@ -129,15 +129,24 @@ function renderPersonMappingList() {
   const container = document.getElementById('personMappingList');
   container.innerHTML = Object.keys(personMappingData).map(person => `
     <div class="d-flex gap-2 align-items-center mb-2">
-      <input type="text" class="form-control form-control-sm" style="width:110px"
-        value="${escapeHtml(person)}"
-        onblur="updatePersonName(this, '${escapeHtml(person)}')">
-      <input type="text" class="form-control form-control-sm flex-grow-1"
+      <input type="text" class="form-control form-control-sm person-name-input" style="width:110px"
+        value="${escapeHtml(person)}" data-person="${escapeHtml(person)}">
+      <input type="text" class="form-control form-control-sm flex-grow-1 person-stores-input"
         value="${escapeHtml(personMappingData[person].join(', '))}"
         placeholder="발송처명을 쉼표로 구분"
-        oninput="updatePersonStores('${escapeHtml(person)}', this.value)">
-      <button class="btn btn-outline-danger btn-sm flex-shrink-0" style="white-space:nowrap" onclick="removePersonMapping('${escapeHtml(person)}')">삭제</button>
+        data-person="${escapeHtml(person)}">
+      <button class="btn btn-outline-danger btn-sm flex-shrink-0 person-remove-btn" style="white-space:nowrap" data-person="${escapeHtml(person)}">삭제</button>
     </div>`).join('');
+
+  container.querySelectorAll('.person-name-input').forEach(el => {
+    el.addEventListener('blur', () => updatePersonName(el, el.dataset.person));
+  });
+  container.querySelectorAll('.person-stores-input').forEach(el => {
+    el.addEventListener('input', () => updatePersonStores(el.dataset.person, el.value));
+  });
+  container.querySelectorAll('.person-remove-btn').forEach(el => {
+    el.addEventListener('click', () => removePersonMapping(el.dataset.person));
+  });
 }
 
 function addPersonMapping() {
@@ -506,8 +515,10 @@ async function saveAsImage() {
 
   try {
     const el = document.getElementById('tab-personal');
-    const responsiveDivs = el.querySelectorAll('.table-responsive');
+    const wasHidden = el.classList.contains('d-none');
+    if (wasHidden) el.classList.remove('d-none');
 
+    const responsiveDivs = el.querySelectorAll('.table-responsive');
     el.style.padding = '32px';
     el.style.background = '#fff';
     responsiveDivs.forEach(d => { d.style.overflow = 'visible'; });
@@ -521,6 +532,7 @@ async function saveAsImage() {
     el.style.padding = '';
     el.style.background = '';
     responsiveDivs.forEach(d => { d.style.overflow = ''; });
+    if (wasHidden) el.classList.add('d-none');
 
     const link = document.createElement('a');
     link.download = `택배비정산_${new Date().toISOString().slice(0, 10)}.png`;
